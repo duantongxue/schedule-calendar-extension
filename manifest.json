@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "排班日历助手",
+  "version": "1.0",
+  "description": "查看每天的白班、小夜和大夜排班",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {}
+  },
+  "permissions": ["storage"]
+}
