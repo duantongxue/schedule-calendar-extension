@@ -1,8 +1,11 @@
 // popup.js
-const shiftNames = ["白班", "小夜", "大夜"];
+const shiftNames = ["白班", "小夜", "大夜", "大夜休"];
 let viewDate = new Date();
 let config = { baseDate: new Date("2026-02-25"), baseShiftIndex: 0 };
 
+/**
+ * 初始化：加载本地存储的配置或默认值
+ */
 function init() {
     const saved = localStorage.getItem('shiftConfig');
     if (saved) {
@@ -12,20 +15,28 @@ function init() {
         document.getElementById('baseDateInput').value = parsed.dateStr;
         document.getElementById('baseShiftInput').value = parsed.baseShiftIndex;
     } else {
+        // 默认配置：2026-02-25 为白班
         document.getElementById('baseDateInput').value = "2026-02-25";
         document.getElementById('baseShiftInput').value = "0";
     }
     render();
 }
 
+/**
+ * 更新设置并保存到本地存储
+ */
 function updateSettings() {
     const dateStr = document.getElementById('baseDateInput').value;
     const shiftIdx = document.getElementById('baseShiftInput').value;
-    if(!dateStr) return;
+    
+    if (!dateStr) {
+        alert('请选择基准日期！');
+        return;
+    }
     
     // 1. 更新内存配置
     config.baseDate = new Date(dateStr);
-    config.baseDate.setHours(0,0,0,0);
+    config.baseDate.setHours(0, 0, 0, 0);
     config.baseShiftIndex = parseInt(shiftIdx);
 
     // 2. 关键步骤：将当前显示的月份切换到基准日期所在的月份
@@ -39,12 +50,27 @@ function updateSettings() {
 
     // 4. 重新渲染
     render();
+    
+    // 5. 给用户反馈
+    alert('排班设置已保存！');
 }
-
 
 function changeMonth(step) {
     viewDate.setMonth(viewDate.getMonth() + step);
     render();
+}
+
+/**
+ * 计算给定日期的班次
+ * @param {Date} date - 要计算的日期
+ * @returns {number} 班次索引 (0:白班，1:小夜，2:大夜，3:下大夜休)
+ */
+function calculateShiftIndex(date) {
+    const diffDays = Math.round((date - config.baseDate) / 86400000);
+    // 4 天循环：白班→小夜→大夜→下大夜休
+    let shiftIndex = (diffDays + config.baseShiftIndex) % 4;
+    if (shiftIndex < 0) shiftIndex += 4;
+    return shiftIndex;
 }
 
 function render() {
@@ -76,11 +102,10 @@ function render() {
     const todayStr = new Date().toDateString();
     for(let d=1; d<=lastDay; d++) {
         const curr = new Date(year, month, d);
-        curr.setHours(0,0,0,0);
-        const diffDays = Math.round((curr - config.baseDate) / 86400000);
-        let shiftIndex = (diffDays + config.baseShiftIndex) % 3;
-        if (shiftIndex < 0) shiftIndex += 3;
+        curr.setHours(0, 0, 0, 0);
         
+        // 使用封装的函数计算班次
+        const shiftIndex = calculateShiftIndex(curr);
         const shift = shiftNames[shiftIndex];
         const isToday = curr.toDateString() === todayStr ? 'is-today' : '';
         

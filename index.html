@@ -154,6 +154,7 @@
             transform: scale(0.9);
             padding: 1px 4px;
             border-radius: 4px;
+            white-space: nowrap;
         }
 
         .shift-白班 {
@@ -169,6 +170,11 @@
         .shift-大夜 {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        .shift-下大夜休 {
+            background: #d4edda;
+            color: #155724;
         }
 
         .is-today {
@@ -193,6 +199,7 @@
 
             .shift-label {
                 font-size: 9px;
+                padding: 1px 3px;
             }
         }
     </style>
@@ -212,6 +219,7 @@
                     <option value="0">白班</option>
                     <option value="1">小夜</option>
                     <option value="2">大夜</option>
+                    <option value="3">大夜休</option>
                 </select>
             </div>
             <button class="btn-save">保存</button>
